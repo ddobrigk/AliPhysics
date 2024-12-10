@@ -738,7 +738,7 @@ TTree *AliAnalysisTaskAO2Dconverter::CreateTree(TreeIndex t)
   if (!fOutputDir)
     AliFatal("No Root subdir|");
   fOutputDir->cd();
-  Printf(Form("Creating tree %s\n", TreeName[t].Data()));
+  Printf(Form("Creating tree %s", TreeName[t].Data()));
   fTree[t] = new TTree(TreeName[t], TreeTitle[t]);
   fTree[t]->SetAutoFlush(0);
   return fTree[t];
@@ -983,10 +983,12 @@ void AliAnalysisTaskAO2Dconverter::InitTF(ULong64_t tfId)
     tCaloTrigger->SetBasketSize("*", fBasketSizeEvents);
   }
 
-
+  Printf("create pmd tree? ...");
+  if(fTreeStatus[kPMD]) Printf("create pmd tree now ...");
   TTree* tPmdInfo = CreateTree(kPMD);
   if (fTreeStatus[kPMD]) {
     // PMD information
+    Printf("create pmd branches now ...");
     tPmdInfo->Branch("fX", &pmdInfo.fX, "fX/F");
     tPmdInfo->Branch("fY", &pmdInfo.fY, "fY/F");
     tPmdInfo->Branch("fZ", &pmdInfo.fZ, "fZ/F");
