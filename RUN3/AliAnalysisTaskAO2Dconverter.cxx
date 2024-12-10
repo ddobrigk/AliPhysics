@@ -233,6 +233,10 @@ namespace
   UInt_t mV0otfMass = 0xFFFFFFFF;
   UInt_t mV0otfMomentum = 0xFFFFFFFF;
 
+  UInt_t mPMDPositionPrecision = 0xFFFFFFFF;
+  UInt_t mPMDEnergyPrecision = 0xFFFFFFFF;
+  UInt_t mPMDProbabilityPrecision = 0xFFFFFFFF;
+
   // No compression for ZDC for the moment
 
 } // namespace
@@ -428,6 +432,10 @@ void AliAnalysisTaskAO2Dconverter::UserCreateOutputObjects()
     mV0otfLength = 0xFFFFF000;  // 11 bits
     mV0otfMass = 0xFFFFF000;    // 11 bits but saved in MeV!
     mV0otfMomentum = 0xFFFFFC00; // 13 bits
+
+    mPMDPositionPrecision = 0xFFFFF000;  // 11 bits
+    mPMDEnergyPrecision = 0xFFFFF000;  // 11 bits
+    mPMDProbabilityPrecision = 0xFFFFF000;  // 11 bits
   }
 
   // create output objects
@@ -983,12 +991,9 @@ void AliAnalysisTaskAO2Dconverter::InitTF(ULong64_t tfId)
     tCaloTrigger->SetBasketSize("*", fBasketSizeEvents);
   }
 
-  Printf("create pmd tree? ...");
-  if(fTreeStatus[kPMD]) Printf("create pmd tree now ...");
   TTree* tPmdInfo = CreateTree(kPMD);
   if (fTreeStatus[kPMD]) {
     // PMD information
-    Printf("create pmd branches now ...");
     tPmdInfo->Branch("fX", &pmdInfo.fX, "fX/F");
     tPmdInfo->Branch("fY", &pmdInfo.fY, "fY/F");
     tPmdInfo->Branch("fZ", &pmdInfo.fZ, "fZ/F");
@@ -3207,14 +3212,14 @@ void AliAnalysisTaskAO2Dconverter::FillEventInTF()
 	  Int_t PMDTrackks = fESD->GetNumberOfPmdTracks();
     for(Int_t trk = 0; trk < PMDTrackks; trk++){
       AliESDPmdTrack *pmdtr = fESD->GetPmdTrack(trk);
-      pmdInfo.fX          = pmdtr->GetClusterX();
-      pmdInfo.fY          = pmdtr->GetClusterY();
-      pmdInfo.fZ          = pmdtr->GetClusterZ();
-      pmdInfo.fCluADC     = pmdtr->GetClusterADC();
-      pmdInfo.fCluPID     = pmdtr->GetClusterPID();
+      pmdInfo.fX          = AliMathBase::TruncateFloatFraction(pmdtr->GetClusterX(), mPMDPositionPrecision);
+      pmdInfo.fY          = AliMathBase::TruncateFloatFraction(pmdtr->GetClusterY(), mPMDPositionPrecision);
+      pmdInfo.fZ          = AliMathBase::TruncateFloatFraction(pmdtr->GetClusterZ(), mPMDPositionPrecision);
+      pmdInfo.fCluADC     = AliMathBase::TruncateFloatFraction(pmdtr->GetClusterADC(), mPMDEnergyPrecision);
+      pmdInfo.fCluPID     = AliMathBase::TruncateFloatFraction(pmdtr->GetClusterPID(), mPMDProbabilityPrecision);
 
-      pmdInfo.fSigX       = pmdtr->GetClusterSigmaX();
-      pmdInfo.fSigY       = pmdtr->GetClusterSigmaY();
+      pmdInfo.fSigX       = AliMathBase::TruncateFloatFraction(pmdtr->GetClusterSigmaX(), mPMDPositionPrecision);
+      pmdInfo.fSigY       = AliMathBase::TruncateFloatFraction(pmdtr->GetClusterSigmaY(), mPMDPositionPrecision);
 
       pmdInfo.fDet        = pmdtr->GetDetector();
       pmdInfo.fNcell      = pmdtr->GetClusterCells();
