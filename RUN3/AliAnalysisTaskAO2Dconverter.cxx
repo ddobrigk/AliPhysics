@@ -811,11 +811,6 @@ void AliAnalysisTaskAO2Dconverter::InitTF(ULong64_t tfId)
 {
   Printf("Initializing TF %lld", tfId);
 
-  for (Int_t i = 0; i < kTrees; i++)
-  {
-    Printf("Tree %i, named %s, status: %i", i, TreeName[i], fTreeStatus[i]);
-  }
-
   // Reset the event count
   fTFCount++;
   fCollisionCount = 0;
@@ -1379,61 +1374,61 @@ void AliAnalysisTaskAO2Dconverter::InitTF(ULong64_t tfId)
       tHFCascade->Branch("fIndexTracks_0", &hfCascades.fIndexTracks_0, "fIndexTracks_0/I");
       tHFCascade->SetBasketSize("*", fBasketSizeEvents);
     }
+  }
 
-    TTree *tTPCPIDEl = CreateTree(kTPCpidEl);
-    if (fTreeStatus[kTPCpidEl])
-    {
-      tTPCPIDEl->Branch("fTPCNSigmaStoreEl", &tracks.fTPCNSigmaStoreEl, "fTPCNSigmaStoreEl/B");
-      tTPCPIDEl->SetBasketSize("*", fBasketSizeEvents);
-    }
-    TTree *tTPCPIDMu = CreateTree(kTPCpidMu);
-    if (fTreeStatus[kTPCpidMu])
-    {
-      tTPCPIDMu->Branch("fTPCNSigmaStoreMu", &tracks.fTPCNSigmaStoreMu, "fTPCNSigmaStoreMu/B");
-      tTPCPIDMu->SetBasketSize("*", fBasketSizeEvents);
-    }
-    TTree *tTPCPIDPi = CreateTree(kTPCpidPi);
-    if (fTreeStatus[kTPCpidPi])
-    {
-      tTPCPIDPi->Branch("fTPCNSigmaStorePi", &tracks.fTPCNSigmaStorePi, "fTPCNSigmaStorePi/B");
-      tTPCPIDPi->SetBasketSize("*", fBasketSizeEvents);
-    }
-    TTree *tTPCPIDKa = CreateTree(kTPCpidKa);
-    if (fTreeStatus[kTPCpidKa])
-    {
-      tTPCPIDPi->Branch("fTPCNSigmaStoreKa", &tracks.fTPCNSigmaStoreKa, "fTPCNSigmaStoreKa/B");
-      tTPCPIDPi->SetBasketSize("*", fBasketSizeEvents);
-    }
-    TTree *tTPCPIDPr = CreateTree(kTPCpidPr);
-    if (fTreeStatus[kTPCpidPr])
-    {
-      tTPCPIDPr->Branch("fTPCNSigmaStorePr", &tracks.fTPCNSigmaStorePr, "fTPCNSigmaStorePr/B");
-      tTPCPIDPr->SetBasketSize("*", fBasketSizeEvents);
-    }
-    TTree *tTPCPIDDe = CreateTree(kTPCpidDe);
-    if (fTreeStatus[kTPCpidDe])
-    {
-      tTPCPIDDe->Branch("fTPCNSigmaStoreDe", &tracks.fTPCNSigmaStoreDe, "fTPCNSigmaStoreDe/B");
-      tTPCPIDDe->SetBasketSize("*", fBasketSizeEvents);
-    }
-    TTree *tTPCPIDTr = CreateTree(kTPCpidTr);
-    if (fTreeStatus[kTPCpidTr])
-    {
-      tTPCPIDTr->Branch("fTPCNSigmaStoreTr", &tracks.fTPCNSigmaStoreTr, "fTPCNSigmaStoreTr/B");
-      tTPCPIDTr->SetBasketSize("*", fBasketSizeEvents);
-    }
-    TTree *tTPCPIDHe = CreateTree(kTPCpidHe);
-    if (fTreeStatus[kTPCpidHe])
-    {
-      tTPCPIDHe->Branch("fTPCNSigmaStoreHe", &tracks.fTPCNSigmaStoreHe, "fTPCNSigmaStoreHe/B");
-      tTPCPIDHe->SetBasketSize("*", fBasketSizeEvents);
-    }
-    TTree *tTPCPIDAl = CreateTree(kTPCpidAl);
-    if (fTreeStatus[kTPCpidAl])
-    {
-      tTPCPIDAl->Branch("fTPCNSigmaStoreAl", &tracks.fTPCNSigmaStoreAl, "fTPCNSigmaStoreAl/B");
-      tTPCPIDAl->SetBasketSize("*", fBasketSizeEvents);
-    }
+  TTree *tTPCPIDEl = CreateTree(kTPCpidEl);
+  if (fTreeStatus[kTPCpidEl])
+  {
+    tTPCPIDEl->Branch("fTPCNSigmaStoreEl", &tracks.fTPCNSigmaStoreEl, "fTPCNSigmaStoreEl/B");
+    tTPCPIDEl->SetBasketSize("*", fBasketSizeEvents);
+  }
+  TTree *tTPCPIDMu = CreateTree(kTPCpidMu);
+  if (fTreeStatus[kTPCpidMu])
+  {
+    tTPCPIDMu->Branch("fTPCNSigmaStoreMu", &tracks.fTPCNSigmaStoreMu, "fTPCNSigmaStoreMu/B");
+    tTPCPIDMu->SetBasketSize("*", fBasketSizeEvents);
+  }
+  TTree *tTPCPIDPi = CreateTree(kTPCpidPi);
+  if (fTreeStatus[kTPCpidPi])
+  {
+    tTPCPIDPi->Branch("fTPCNSigmaStorePi", &tracks.fTPCNSigmaStorePi, "fTPCNSigmaStorePi/B");
+    tTPCPIDPi->SetBasketSize("*", fBasketSizeEvents);
+  }
+  TTree *tTPCPIDKa = CreateTree(kTPCpidKa);
+  if (fTreeStatus[kTPCpidKa])
+  {
+    tTPCPIDPi->Branch("fTPCNSigmaStoreKa", &tracks.fTPCNSigmaStoreKa, "fTPCNSigmaStoreKa/B");
+    tTPCPIDPi->SetBasketSize("*", fBasketSizeEvents);
+  }
+  TTree *tTPCPIDPr = CreateTree(kTPCpidPr);
+  if (fTreeStatus[kTPCpidPr])
+  {
+    tTPCPIDPr->Branch("fTPCNSigmaStorePr", &tracks.fTPCNSigmaStorePr, "fTPCNSigmaStorePr/B");
+    tTPCPIDPr->SetBasketSize("*", fBasketSizeEvents);
+  }
+  TTree *tTPCPIDDe = CreateTree(kTPCpidDe);
+  if (fTreeStatus[kTPCpidDe])
+  {
+    tTPCPIDDe->Branch("fTPCNSigmaStoreDe", &tracks.fTPCNSigmaStoreDe, "fTPCNSigmaStoreDe/B");
+    tTPCPIDDe->SetBasketSize("*", fBasketSizeEvents);
+  }
+  TTree *tTPCPIDTr = CreateTree(kTPCpidTr);
+  if (fTreeStatus[kTPCpidTr])
+  {
+    tTPCPIDTr->Branch("fTPCNSigmaStoreTr", &tracks.fTPCNSigmaStoreTr, "fTPCNSigmaStoreTr/B");
+    tTPCPIDTr->SetBasketSize("*", fBasketSizeEvents);
+  }
+  TTree *tTPCPIDHe = CreateTree(kTPCpidHe);
+  if (fTreeStatus[kTPCpidHe])
+  {
+    tTPCPIDHe->Branch("fTPCNSigmaStoreHe", &tracks.fTPCNSigmaStoreHe, "fTPCNSigmaStoreHe/B");
+    tTPCPIDHe->SetBasketSize("*", fBasketSizeEvents);
+  }
+  TTree *tTPCPIDAl = CreateTree(kTPCpidAl);
+  if (fTreeStatus[kTPCpidAl])
+  {
+    tTPCPIDAl->Branch("fTPCNSigmaStoreAl", &tracks.fTPCNSigmaStoreAl, "fTPCNSigmaStoreAl/B");
+    tTPCPIDAl->SetBasketSize("*", fBasketSizeEvents);
   }
 
   Prune(); //Removing all unwanted branches (if any)
