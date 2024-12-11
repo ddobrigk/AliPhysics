@@ -811,6 +811,11 @@ void AliAnalysisTaskAO2Dconverter::InitTF(ULong64_t tfId)
 {
   Printf("Initializing TF %lld", tfId);
 
+  for (Int_t i = 0; i < kTrees; i++)
+  {
+    Printf("Tree %i, named %s, status: %i", i, TreeName[i], fTreeStatus[i]);
+  }
+
   // Reset the event count
   fTFCount++;
   fCollisionCount = 0;
