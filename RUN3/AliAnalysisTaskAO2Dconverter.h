@@ -105,6 +105,8 @@ public:
 
   void SetDisableEMCAL(bool flag = true) { fDisableEMCAL = flag; }
 
+  int8_t packInInt8(float nSigma);
+
   static AliAnalysisTaskAO2Dconverter* AddTask(TString suffix = "");
   enum TreeIndex { // Index of the output trees
     kEvents = 0,
@@ -142,6 +144,15 @@ public:
     kHepMcPdfInfo,
     kHepMcHeavyIon,
     kRun2TrackExtras,
+    kTPCpidEl,
+    kTPCpidMu,
+    kTPCpidPi,
+    kTPCpidKa, 
+    kTPCpidPr,
+    kTPCpidDe,
+    kTPCpidTr, 
+    kTPCpidHe, 
+    kTPCpidAl,
     kTrees
   };
   enum TaskModes { // Flag for the task operation mode
@@ -431,6 +442,17 @@ private:
     // Time information about the track
     Float_t fTrackTime = -999.f;    /// Track time
     Float_t fTrackTimeRes = -999.f; /// Track time reso
+
+    // packed information of TPC dEdx (tiny version) for cross-checks
+    int8_t fTPCNSigmaStoreEl;
+    int8_t fTPCNSigmaStoreMu;
+    int8_t fTPCNSigmaStorePi;
+    int8_t fTPCNSigmaStoreKa;
+    int8_t fTPCNSigmaStorePr;
+    int8_t fTPCNSigmaStoreDe;
+    int8_t fTPCNSigmaStoreTr;
+    int8_t fTPCNSigmaStoreHe;
+    int8_t fTPCNSigmaStoreAl;
   } tracks;                      //! structure to keep track information
 
   struct {
