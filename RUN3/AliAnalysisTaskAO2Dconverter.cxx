@@ -752,7 +752,7 @@ TTree *AliAnalysisTaskAO2Dconverter::CreateTree(TreeIndex t)
   if (!fOutputDir)
     AliFatal("No Root subdir|");
   fOutputDir->cd();
-  AliInfo(Form("Creating tree %s\n", TreeName[t].Data()));
+  Printf(Form("Creating tree %s\n", TreeName[t].Data()));
   fTree[t] = new TTree(TreeName[t], TreeTitle[t]);
   fTree[t]->SetAutoFlush(0);
   return fTree[t];
