@@ -130,7 +130,8 @@ const TString AliAnalysisTaskAO2Dconverter::TreeName[kTrees] = {
   "O2hepmcxsection",
   "O2hepmcpdfinfo",
   "O2hepmcheavyion",
-  "O2run2trackextra_001"
+  "O2run2trackextra_001",
+  "O2fmd"
 };
 
 const TString AliAnalysisTaskAO2Dconverter::TreeTitle[kTrees] = {
@@ -168,7 +169,8 @@ const TString AliAnalysisTaskAO2Dconverter::TreeTitle[kTrees] = {
   "O2 HepMc Cross Sections",
   "O2 HepMc Pdf Info",
   "O2 HepMc Heavy Ion",
-  "Barrel tracks Extra Run2"
+  "Barrel tracks Extra Run2",
+  "O2 fmd information"
 };
 
 const TClass *AliAnalysisTaskAO2Dconverter::Generator[kGenerators] = {AliGenEventHeader::Class(), AliGenCocktailEventHeader::Class(), AliGenDPMjetEventHeader::Class(), AliGenEpos3EventHeader::Class(), AliGenEposEventHeader::Class(), AliGenEventHeaderTunedPbPb::Class(), AliGenGeVSimEventHeader::Class(), AliGenHepMCEventHeader::Class(), AliGenHerwigEventHeader::Class(), AliGenHijingEventHeader::Class(), AliGenPythiaEventHeader::Class(), AliGenToyEventHeader::Class()};
@@ -229,6 +231,8 @@ namespace
   UInt_t mV0otfLength = 0xFFFFFFFF;
   UInt_t mV0otfMass = 0xFFFFFFFF;
   UInt_t mV0otfMomentum = 0xFFFFFFFF;
+
+  UInt_t mFMD = 0xFFFFFFFF; 
 
   // No compression for ZDC for the moment
 
@@ -424,6 +428,8 @@ void AliAnalysisTaskAO2Dconverter::UserCreateOutputObjects()
     mV0otfLength = 0xFFFFF000;  // 11 bits
     mV0otfMass = 0xFFFFF000;    // 11 bits but saved in MeV!
     mV0otfMomentum = 0xFFFFFC00; // 13 bits
+
+    mFMD = 0xFFFFF000; 
   }
 
   // create output objects
@@ -1185,6 +1191,21 @@ void AliAnalysisTaskAO2Dconverter::InitTF(ULong64_t tfId)
     tHMPID->Branch("fHMPIDMom", &hmpids.fHMPIDMom, "fHMPIDMom/F");
     tHMPID->Branch("fHMPIDPhotsCharge", &hmpids.fHMPIDPhotsCharge, "fHMPIDPhotsCharge[10]/F");
     tHMPID->SetBasketSize("*", fBasketSizeTracks);
+  }
+
+  TTree* tfmd = CreateTree(kFMD);
+  if (tfmd) {
+    tfmd->Branch("fIndexBCs",     &fmd.fIndexBCs,    "fIndexBCs/I");
+    tfmd->Branch("fMultiplicity", &fmd.fMultiplicity, Form("fMultiplicity[%d]/F", kFMDNbins));
+    tfmd->Branch("fIPz",          &fmd.fIPz, "fIPz/F");
+    tfmd->Branch("fCentraltity",  &fmd.fCentraltity, "fCentraltity/F");
+    tfmd->Branch("fNClusters",    &fmd.fNClusters,   "fNClusters/s");
+    tfmd->Branch("fFlags",        &fmd.fFlags,       "fFlags/i");
+    tfmd->Branch("fConditions",   &fmd.fConditions,  "fConditions/b");
+    tfmd->Branch("fEtaAcceptance",&fmd.fEtaAcceptance, Form("fEtaAcceptance[%d]/O", kFMDNeta));
+    tfmd->Branch("fPhiAcceptance",&fmd.fPhiAcceptance, Form("fPhiAcceptance[%d]/F", kFMDNphi));
+    tfmd->Branch("fSystem",       &fmd.fSystem,      "fSystem/b");
+    tfmd->Branch("fSNN",          &fmd.fSNN,         "fSNN/F");
   }
 
   if (fTaskMode == kMC)
@@ -3277,6 +3298,65 @@ void AliAnalysisTaskAO2Dconverter::FillEventInTF()
     mccollisionlabel.fMcMask = 0;
     FillTree(kMcCollisionLabel);
   }
+
+  auto getFMD = [](auto esd) {
+  if (!esd) {
+    return nullptr;
+  }
+  // TObject* obj = esd->FindListObject("ForwardMC");
+  // if (!obj) {
+  //   obj = aod.FindListObject("Forward");
+  // }
+  AliESDFMD* esdFMD = fESD->GetFMDData();  
+  if (!esdFMD) return;
+
+  AliAODForwardMult* forward = static_cast<AliAODForwardMult*>(obj);
+  return forward;
+};
+auto getFMDHist = [](auto fwd) {
+  TH2* hist = fwd->GetHistogram();
+  if (hist->GetXNbins() != kFMDNeta or
+      hist->GetYNbins() != kFMDNphi) {
+    Warning("","Inconsistent number of FMD eta or phi bins");
+    return nullptr;
+  }
+  return hist;
+}
+auto fmdTrunc = [](Float_t x) {
+  return AliMathBase::TruncateFloatFraction(x,mFMD); };
+
+AliAODForwardMult* fwdm = getFMD(fAOD);
+if (fwdm) {
+  TH2* hist = getFMDHist(fwdm);
+
+  if (hist) {
+    auto etaBin = fwdm->GetEtaCoverageBin();
+    auto phiBin = fwdm->GetPhiAcceptanceBin();
+
+    fmd.fIndexBCs = fBCCount;
+
+    for (Int_t ieta = 0; ieta < kFMDNeta; ++ieta) {
+      for (Int_t iphi = 0; iphi < kFMDNphi; ++iphi) {
+        fmd.fMultiplicity[ieta * kFMDNphi + iphi] =
+          fmdTrunc(hist->GetBinContent(ieta+1,iphi+1));
+      }
+
+      fmd.fEtaAcceptance[ieta] = hist->GetBinContent(ieta+1,etaBin)>0;
+      fmd.fPhiAcceptance[ieta] = fmdTrunc(hist->GetBinContent(ieta+1,phiBin));
+    }
+
+    fmd.fNClusters  = fwdm->GetNClusters();
+    fmd.fIPz        = fwdm->GetIpZ();
+    fmd.fCentrality = fmdTrunc(fwdm->GetCentrality());
+    fmd.fFlags      = fwdm->GetTriggerBits();
+    fmd.fConditions = (fwdm->TestBits(0xFFFFFFFF) >> 14 |
+                      fwdm->IsMC() ? 1 << 6);
+    fmd.fSystem     = hist->GetBinContent(kFMDNeta+1,0);
+    fmd.fSNN        = fmdTrunc(hist->GetBinContent(0,0));
+
+    FillTree(kFMD);
+  }
+}
 
   //---------------------------------------------------------------------------
   // Update the offsets at the end of each collision
