@@ -4256,7 +4256,7 @@ int8_t AliAnalysisTaskAO2Dconverter::packInInt8(float nSigma)
 
   // calculate
   if(nSigma<=binned_min) return underflowBin;
-  if(nSigma>=binned_min) return overflowBin;
+  if(nSigma>=binned_max) return overflowBin;
   if(nSigma>=0){
     return static_cast<int8_t>((nSigma/bin_width)+0.5f);
   }
