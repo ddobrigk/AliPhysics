@@ -1397,8 +1397,8 @@ void AliAnalysisTaskAO2Dconverter::InitTF(ULong64_t tfId)
   TTree *tTPCPIDKa = CreateTree(kTPCpidKa);
   if (fTreeStatus[kTPCpidKa])
   {
-    tTPCPIDPi->Branch("fTPCNSigmaStoreKa", &tracks.fTPCNSigmaStoreKa, "fTPCNSigmaStoreKa/B");
-    tTPCPIDPi->SetBasketSize("*", fBasketSizeEvents);
+    tTPCPIDKa->Branch("fTPCNSigmaStoreKa", &tracks.fTPCNSigmaStoreKa, "fTPCNSigmaStoreKa/B");
+    tTPCPIDKa->SetBasketSize("*", fBasketSizeEvents);
   }
   TTree *tTPCPIDPr = CreateTree(kTPCpidPr);
   if (fTreeStatus[kTPCpidPr])
